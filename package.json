@@ -8,10 +8,10 @@
     "test": "tests"
   },
   "scripts": {
-    "postinstall": "./node_modules/.bin/bower install",
-    "start": "./node_modules/.bin/ember server --environment=production --port=${VCAP_APP_PORT}",
-    "build": "./node_modules/.bin/ember build",
-    "test": "./node_modules/.bin/ember test"
+    "postinstall": "npm install && ./node_modules/.bin/bower install",
+    "start": "./node_modules/ember-cli/bin/ember server --environment=production --port=${VCAP_APP_PORT}",
+    "build": "./node_modules/ember-cli/bin/ember build",
+    "test": "./node_modules/ember-cli/bin/ember test"
   },
   "repository": "",
   "engines": {
@@ -20,6 +20,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "bower": "^1.3.12",
     "broccoli-asset-rev": "^2.0.2",
     "ember-cli": "0.2.0",
     "ember-cli-app-version": "0.3.3",
