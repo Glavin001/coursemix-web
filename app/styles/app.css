@@ -1,11 +1,45 @@
 
 .tradeoff-analytics-container {
     width: 100%;
-    height: 70vh;
+    height: 80vh;
 
 }
 
+/* Defaults */
 .tradeoff-analytics-container iframe {
     width: 100%;
     height: 100%;
+}
+.tradeoff-analytics-component .error-message {
+    display: none;
+}
+.tradeoff-analytics-component .tradeoff-analytics-container {
+    display: none;
+}
+
+/* On loading */
+.tradeoff-analytics-component.loading .tradeoff-analytics-container {
+    display: none;
+}
+
+/* On error */
+.tradeoff-analytics-component.error .error-message {
+    display: block;
+}
+.tradeoff-analytics-component.error .loading-message {
+    display: none;
+}
+.tradeoff-analytics-component.error .tradeoff-analytics-container {
+    display: none;
+}
+
+/* On ready */
+.tradeoff-analytics-component.ready .error-message {
+    display: none;
+}
+.tradeoff-analytics-component.ready .loading-message {
+    display: none;
+}
+.tradeoff-analytics-component.ready .tradeoff-analytics-container {
+    display: block;
 }

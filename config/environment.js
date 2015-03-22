@@ -23,7 +23,7 @@ module.exports = function(environment) {
             'script-src': "'self' 'unsafe-eval' https://ta-cdn.mybluemix.net/ ",
             'frame-src': "'self' 'unsafe-eval' https://ta-cdn.mybluemix.net/ ",
             'font-src': "'self'",
-            'connect-src': "'self'",
+            'connect-src': "'self' 'unsafe-eval' * ",
             'img-src': "'self'",
             'style-src': "'self'",
             'media-src': "'self'"
