@@ -1,0 +1,11 @@
+
+.tradeoff-analytics-container {
+    width: 100%;
+    height: 70vh;
+
+}
+
+.tradeoff-analytics-container iframe {
+    width: 100%;
+    height: 100%;
+}
