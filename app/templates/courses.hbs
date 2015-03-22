@@ -1,5 +1,9 @@
 <h3>Step 1. Configure Your Preferences</h3>
 
+<audio></audio>
+
+<div class="step-1">
+
 <p>What do you care about? Please select 14 columns to analyze.</p>
 
 {{#if controller.tooManyColumns}}
@@ -50,6 +54,12 @@
 
 {{/each}}
 
+<button class="btn btn-success" {{action "storyStep2"}}>Continue</button>
+
+</div>
+
+<div class="step-2">
+
 <hr/>
 
 <h3>Step 2. Select subset of Courses</h3>
@@ -86,6 +96,10 @@
 
 <hr/>
 
+</div>
+
+<div class="step-3">
+
 <h3>Step 3. Submit Tradeoff Analytics</h3>
 
 <button class="btn btn-primary" {{action "refreshOptions"}}>Refresh Tradeoffs</button>
@@ -93,6 +107,10 @@
 {{tradeoff-analytics problem=controller.problem refresh=controller.refreshTradeoffs onResultSelection="onResultSelection" }}
 
 <hr/>
+
+</div>
+
+<div class="step-4">
 
 <h3>Step 4. Decide on courses</h3>
 
@@ -180,6 +198,10 @@ Select a course for your decision and click
 
 <hr/>
 
+</div>
+
+<div class="step-5">
+
 <h3>Step 5. Register</h3>
 
 <p>Email your courses to yourself as a reminder to register when you can.</p>
@@ -198,5 +220,6 @@ Select a course for your decision and click
   <button {{action "emailCourses"}} class="btn btn-success">Email Courses</button>
 </div>
 
-
 <br/>
+
+</div>

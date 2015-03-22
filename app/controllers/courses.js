@@ -19,6 +19,8 @@ export default Ember.Controller.extend({
                 self.set('subjects', subjects);
             });
 
+        self.send('storyWelcome');
+
     }.on('init'),
 
     subjects: Ember.A(),
@@ -38,6 +40,81 @@ export default Ember.Controller.extend({
 
     actions: {
 
+        storyWelcome: function() {
+            var self = this;
+            self.send('speak', 'Welcome to Course mix', function() {
+                return self.send('speak', 'I am Watson. I will guide you through to pick your ideal courses.', function() {
+
+                    // Hide steps
+                    $('.step-2, .step-3, .step-4, .step-5').hide();
+
+                    self.send('storyStep1');
+                });
+            })
+        },
+
+        storyStep1: function() {
+            var self = this;
+            self.send('speak', 'Let\'s get started.', function() {
+                self.send('speak', "Please select your preferences and then press continue");
+            });
+        },
+        storyStep2: function() {
+            var self = this;
+            $('.step-2').show();
+            self.send('speak', 'Now select your subjects of interest and press "Find courses"', function() {
+
+            });
+        },
+        storyStep3: function() {
+            var self = this;
+            $('.step-3').show();
+            self.send('speak', 'Next let\'s submit our courses to be processed by Tradeoff Analytics. Please press "Refresh Tradeoffs" button.', function() {
+
+            });
+        },
+        storyStep4: function() {
+            var self = this;
+            $('.step-4').show();
+            self.send('speak', "Excellent. Please give me a few moments to process", function() {
+                self.send('speak', 'Once I am finished, you can use my tradeoff visualizations to help optimize your course selection.', function() {
+                    setTimeout(function() {
+                        self.send('speak', 'You can select your course and press "This is my decision" and then and press "Done" button at the top right corner to save the course', function() {
+                            self.send('speak', 'You must press the "Done" button to save your course. You can save multiple courses.', function() {
+
+                            });
+                        });
+                    }, 2000);
+                });
+            });
+        },
+        storyStep5: function() {
+            var self = this;
+            $('.step-5').show();
+            self.send('speak', 'You can email your selected courses to yourself to remember to register for them!', function() {
+
+            });
+        },
+
+        speak: function(text, cb) {
+            console.log('speak', text);
+
+            var url = config.APP.apiHost +
+                '/speech/synthesize?text=' + text;
+
+            var audio = $(
+                '<audio class="audio" autoplay preload="auto" autobuffer controls></audio>'
+            ).get(0);
+
+            // console.log(url);
+
+            $(audio).bind('ended', function() {
+                cb();
+            });
+            audio.setAttribute('src', url);
+
+        },
+
         emailCourses: function() {
             var email = this.get('userEmail');
             var courses = this.get('selectedCourses');
@@ -49,15 +126,29 @@ export default Ember.Controller.extend({
                 console.log(arguments);
             });
 
+            self.send('speak', 'I have emailed your courses. Enjoy!', function(){
+
+            });
+
         },
 
         onResultSelection: function(course) {
             console.log('onResultSelection', course, this);
 
             var selected = this.get('selectedCourses');
+
+            if (selected.get('length') === 0) {
+                this.send('storyStep5');
+            }
+
             selected.pushObject(course);
             this.set('selectedCourses', selected.uniq());
 
+        },
+
+        removeCourse: function(course) {
+            var selected = this.get('selectedCourses');
+            selected.removeObject(course);
         },
 
         findCourses: function() {
@@ -74,6 +165,9 @@ export default Ember.Controller.extend({
                 limit: this.get('coursesLimit')
             });
             this.set('courses', courses);
+
+            self.send('storyStep3');
+
             // courses.then(function(courses) {
             //     courses.forEach(function(course) {
             //         self.send('addCourse', course);
@@ -103,6 +197,10 @@ export default Ember.Controller.extend({
             console.log('refreshOptions', courses);
 
             var problem = this.get('problem');
+
+            if (problem.options.length === 0) {
+                this.send('storyStep4');
+            }
 
             var columns = this.get('enabledColumns');
 
@@ -182,7 +280,7 @@ export default Ember.Controller.extend({
 
                     },
                     "app_data": {
-                        "course": JSON.stringify(course) 
+                        "course": JSON.stringify(course)
                     }
                 };
             });

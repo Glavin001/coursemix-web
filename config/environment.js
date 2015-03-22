@@ -19,14 +19,14 @@ module.exports = function(environment) {
         },
 
         contentSecurityPolicy: {
-            'default-src': "'none'",
+            'default-src': "'self' 'unsafe-eval' 'unsafe-inline' * ",
             'script-src': "'self' 'unsafe-eval' https://ta-cdn.mybluemix.net/ ",
             'frame-src': "'self' 'unsafe-eval' https://ta-cdn.mybluemix.net/ ",
-            'font-src': "'self'",
+            'font-src': "'self' 'unsafe-eval' 'unsafe-inline' * ",
             'connect-src': "'self' 'unsafe-eval' * ",
-            'img-src': "'self'",
+            'img-src': "'self' 'unsafe-eval' 'unsafe-inline' * ",
             'style-src': "'self' 'unsafe-eval' 'unsafe-inline' * ",
-            'media-src': "'self'"
+            'media-src': "'self' 'unsafe-eval' 'unsafe-inline' * "
         }
 
     };
