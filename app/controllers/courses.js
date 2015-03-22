@@ -22,7 +22,7 @@ export default Ember.Controller.extend({
     }.on('init'),
 
     subjects: Ember.A(),
-
+    userEmail: "",
     courses: [],
     coursesLimit: 1000,
     selectedSubjects: Ember.A(),
@@ -38,6 +38,19 @@ export default Ember.Controller.extend({
 
     actions: {
 
+        emailCourses: function() {
+            var email = this.get('userEmail');
+            var courses = this.get('selectedCourses');
+            Ember.$.post(config.APP.apiHost +
+                "/api/courses/email-courses", {
+                    "email": email,
+                    "courses": JSON.stringify(courses)
+                }).then(function() {
+                console.log(arguments);
+            });
+
+        },
+
         onResultSelection: function(course) {
             console.log('onResultSelection', course, this);
 
@@ -51,11 +64,12 @@ export default Ember.Controller.extend({
             var self = this;
             var courses = Courses.findAll({
                 where: {
-                    "or": self.get('selectedSubjects').map(function(subj) {
-                        return {
-                            "subject_id": subj
-                        };
-                    })
+                    "or": self.get('selectedSubjects').map(
+                        function(subj) {
+                            return {
+                                "subject_id": subj
+                            };
+                        })
                 },
                 limit: this.get('coursesLimit')
             });
@@ -110,16 +124,22 @@ export default Ember.Controller.extend({
 
                 return {
                     "key": course.crn,
-                    "name": course.subject_id + " " + course.course_id + "." + course.section + " - "+ course.title,
+                    "name": course.subject_id + " " +
+                        course.course_id + "." + course.section +
+                        " - " + course.title,
                     "values": {
                         "crn": course.crn,
                         // "subject_id": course.subject_id,
                         // "section": course.section,
 
-                        "begin_time_hours": course.begin_time && course.begin_time.hours,
-                        "begin_time_minutes": course.begin_time && course.begin_time.minutes,
-                        "end_time_hours": course.end_time && course.end_time.hours,
-                        "end_time_minutes": course.end_time && course.end_time.minutes,
+                        "begin_time_hours": course.begin_time &&
+                            course.begin_time.hours,
+                        "begin_time_minutes": course.begin_time &&
+                            course.begin_time.minutes,
+                        "end_time_hours": course.end_time &&
+                            course.end_time.hours,
+                        "end_time_minutes": course.end_time &&
+                            course.end_time.minutes,
 
                         "course_id": course.course_id,
                         "on_monday": course.on_monday ? 1 : 0,
@@ -161,7 +181,9 @@ export default Ember.Controller.extend({
                         "requires_presentations": 0
 
                     },
-                    "meta": course
+                    "app_data": {
+                        "course": JSON.stringify(course) 
+                    }
                 };
             });
 

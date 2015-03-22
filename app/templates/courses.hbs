@@ -20,7 +20,7 @@
     </div>
     <div class="panel-body">
 
-        <p>{{group.description}}</p>
+      <p>{{group.description}}</p>
 
       {{#each column in group.columns}}
 
@@ -54,40 +54,34 @@
 
 <h3>Step 2. Select subset of Courses</h3>
 
-{{select-2
-    content=controller.subjects
-    value=controller.selectedSubjects
-    multiple=true
-    optionValuePath="id"
-    placeholder="Choose some course subjects"
-}}
+{{select-2 content=controller.subjects value=controller.selectedSubjects multiple=true optionValuePath="id" placeholder="Choose some course subjects" }}
 
 <br/>
 
 {{#if controller.selectedSubjects.length}}
-    <button {{action 'findCourses'}} class="btn btn-primary">Click to find courses for {{controller.selectedSubjects}}</button>
+  <button {{action 'findCourses'}} class="btn btn-primary">Click to find courses for {{controller.selectedSubjects}}</button>
 
-    <br/>
-    <br/>
+  <br/>
+  <br/>
 
-    {{#if controller.courses}}
+  {{#if controller.courses}}
 
-      Loaded {{controller.courses.length}} courses.
+    Loaded {{controller.courses.length}} courses.
 
+  {{else}}
+    {{#if controller.courses.isPending}}
+      <div class="alert alert-info">
+        Loading...
+      </div>
     {{else}}
-      {{#if controller.courses.isPending}}
-        <div class="alert alert-info">
-          Loading...
-        </div>
-      {{else}}
-        <div class="alert alert-danger">
-          No classes found. Please search above.
-        </div>
-      {{/if}}
+      <div class="alert alert-danger">
+        No classes found. Please search above.
+      </div>
     {{/if}}
+  {{/if}}
 
 {{else}}
-    <p>Please select subjects above.</p>
+  <p>Please select subjects above.</p>
 {{/if}}
 
 <hr/>
@@ -110,18 +104,14 @@ Select a course for your decision and click
 
 {{#if controller.selectedCourses}}
 
-  Selected {{controller.selectedCourses.length}} courses.
+  You have selected {{controller.selectedCourses.length}} courses so far.
 
   {{#each course in controller.selectedCourses}}
 
     <div class="panel panel-primary animated fadeInUp">
       <div class="panel-heading">
         <h3 class="panel-title">
-          {{#if course.isSelected}}
-            <button class="btn btn-danger" {{action "removeCourse" course}}>Remove Course</button>
-          {{else}}
-            <button class="btn btn-success add-course-btn" {{action "addCourse" course}}>Add Course</button>
-          {{/if}}
+          <button class="btn btn-danger" {{action "removeCourse" course}}>Remove Course</button>
 
           CRN {{course.values.crn}} - {{course.name}}
         </h3>
@@ -171,7 +161,8 @@ Select a course for your decision and click
             <span class="label label-info">Sunday</span>
           {{/if}}
 
-          {{!-- <code>
+          {{!--
+          <code>
             {{json-stringify course}}
           </code> --}}
 
@@ -190,3 +181,22 @@ Select a course for your decision and click
 <hr/>
 
 <h3>Step 5. Register</h3>
+
+<p>Email your courses to yourself as a reminder to register when you can.</p>
+
+<div>
+  <div class="form-group">
+    <label for="exampleInputEmail1">Email address</label>
+    {{input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email" value=controller.userEmail}}
+  </div>
+  {{!--
+  <div class="checkbox">
+    <label>
+      <input type="checkbox"> Check me out
+    </label>
+  </div> --}}
+  <button {{action "emailCourses"}} class="btn btn-success">Email Courses</button>
+</div>
+
+
+<br/>
