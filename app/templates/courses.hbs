@@ -4,22 +4,21 @@
 
 <button {{action 'findCourses'}} class="btn btn-primary">Find courses</button>
 
-<br/><br/>
+<br/>
+<br/>
 
 {{#if controller.courses}}
 
-    Loaded {{controller.courses.length}} courses.
-
-    {{!--
+  Loaded {{controller.courses.length}} courses. {{!--
   {{#each course in controller.courses}}
 
     <div class="panel panel-primary animated fadeInUp">
       <div class="panel-heading">
         <h3 class="panel-title">
           {{#if course.isSelected}}
-              <button class="btn btn-danger" {{action "removeCourse" course}}>Remove Course</button>
-              {{else}}
-              <button class="btn btn-success add-course-btn" {{action "addCourse" course}}>Add Course</button>
+            <button class="btn btn-danger" {{action "removeCourse" course}}>Remove Course</button>
+          {{else}}
+            <button class="btn btn-success add-course-btn" {{action "addCourse" course}}>Add Course</button>
           {{/if}}
 
           {{course.crn}} - {{course.subject_id}} {{course.course_id}}.{{course.section}} - {{course.title}}
@@ -71,7 +70,7 @@
           {{/if}}
 
           <code>
-              {{json-stringify course}}
+            {{json-stringify course}}
           </code>
 
 
@@ -83,26 +82,61 @@
   --}}
 
 {{else}}
-    {{#if controller.courses.isPending}}
-        <div class="alert alert-info">
-          Loading...
-        </div>
-    {{else}}
-      <div class="alert alert-danger">
-        No classes found. Please search above.
-      </div>
-    {{/if}}
+  {{#if controller.courses.isPending}}
+    <div class="alert alert-info">
+      Loading...
+    </div>
+  {{else}}
+    <div class="alert alert-danger">
+      No classes found. Please search above.
+    </div>
+  {{/if}}
 {{/if}}
 
 <h3>Step 2. Configure Your Preferences</h3>
+
+<p>What do you care about? Please select 14 columns to analyze.</p>
+
+{{#if controller.tooManyColumns}}
+  <div class="alert alert-danger">
+    You have selected too many columns. You can only have 14. Please deselect some.
+  </div>
+{{else}}
+  <div class="alert alert-success">
+    You have selected {{controller.enabledColumns.length}} out of your 14 allowed.
+  </div>
+{{/if}}
+
+{{#each column in controller.columns}}
+
+  {{#if column.enabled}}
+
+    <button type="button" {{action "disableColumn" column}} class="btn btn-labeled btn-success">
+      <span class="btn-label">
+        <i class="glyphicon glyphicon-ok"></i></span>
+      Disable
+      <em>{{column.full_name}}</em> Column
+    </button>
+
+  {{else}}
+
+    <button type="button" {{action "enableColumn" column}} class="btn btn-labeled btn-danger">
+      <span class="btn-label">
+        <i class="glyphicon glyphicon-remove"></i>
+      </span>
+      Enable
+      <em>{{column.full_name}}</em> Column
+    </button>
+
+  {{/if}}
+
+{{/each}}
 
 <h3>Step 3. Submit Tradeoff Analytics</h3>
 
 <button class="btn btn-primary" {{action "refreshOptions"}}>Refresh Tradeoffs</button>
 
-{{tradeoff-analytics
-    problem=controller.problem
-    refresh=controller.refreshTradeoffs}}
+{{tradeoff-analytics problem=controller.problem refresh=controller.refreshTradeoffs}}
 
 <h3>Step 4. Decide on courses</h3>
 

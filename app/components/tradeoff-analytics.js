@@ -5,7 +5,7 @@ import layout from '../templates/components/tradeoff-analytics';
 export default Ember.Component.extend({
     layout: layout,
     tagName: 'div',
-    classNames: 'tradeoff-analytics-component container-fluid',
+    classNames: 'tradeoff-analytics-component',
 
     problem: {},
 
@@ -20,7 +20,6 @@ export default Ember.Component.extend({
     taClient: null,
     errCallback: function(err) {
         console.error('errCallback', err);
-
     },
     onResultsReady: function() {
         console.log('onResultsReady', arguments);
