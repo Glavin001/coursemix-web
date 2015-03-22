@@ -39,10 +39,6 @@ module.exports = function(environment) {
         // ENV.APP.LOG_VIEW_LOOKUPS = true;
         ENV.APP.apiHost = "http://localhost:3000"
 
-        if (process.env.COURSEMIX_API) {
-            ENV.APP.apiHost = process.env.COURSEMIX_API;
-        }
-        
     }
 
     if (environment === 'test') {
@@ -59,6 +55,10 @@ module.exports = function(environment) {
 
     if (environment === 'production') {
 
+    }
+
+    if (process.env.COURSEMIX_API) {
+        ENV.APP.apiHost = process.env.COURSEMIX_API;
     }
 
     return ENV;
