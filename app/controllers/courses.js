@@ -4,8 +4,28 @@ import Courses from '../models/courses';
 
 export default Ember.Controller.extend({
 
+    _loadSubjects: function() {
+        var self = this;
+        Courses.subjects()
+            .then(function(subjects) {
+                console.log(subjects);
+                subjects = subjects.map(function(subj) {
+                    return {
+                        id: subj,
+                        text: subj,
+                        // description: "The original italian one"
+                    };
+                });
+                self.set('subjects', subjects);
+            });
+
+    }.on('init'),
+
+    subjects: Ember.A(),
+
     courses: [],
-    coursesLimit: 100,
+    coursesLimit: 1000,
+    selectedSubjects: Ember.A(),
 
     selectedCourses: [],
 
@@ -18,27 +38,43 @@ export default Ember.Controller.extend({
 
     actions: {
 
-        findCourses: function() {
-            var self = this;
-            var courses = Courses.findAll({
-                limit: this.get('coursesLimit')
-            });
-            this.set('courses', courses);
-            courses.then(function(courses) {
-                courses.forEach(function(course) {
-                    self.send('addCourse', course);
-                });
-            });
-        },
-
-        addCourse: function(course) {
+        onResultSelection: function(course) {
+            console.log('onResultSelection', course, this);
 
             var selected = this.get('selectedCourses');
             selected.pushObject(course);
             this.set('selectedCourses', selected.uniq());
-            course.set('isSelected', true);
 
         },
+
+        findCourses: function() {
+            var self = this;
+            var courses = Courses.findAll({
+                where: {
+                    "or": self.get('selectedSubjects').map(function(subj) {
+                        return {
+                            "subject_id": subj
+                        };
+                    })
+                },
+                limit: this.get('coursesLimit')
+            });
+            this.set('courses', courses);
+            // courses.then(function(courses) {
+            //     courses.forEach(function(course) {
+            //         self.send('addCourse', course);
+            //     });
+            // });
+        },
+
+        // addCourse: function(course) {
+        //
+        //     var selected = this.get('selectedCourses');
+        //     selected.pushObject(course);
+        //     this.set('selectedCourses', selected.uniq());
+        //     course.set('isSelected', true);
+        //
+        // },
 
         enableColumn: function(column) {
             console.log(column);
@@ -49,15 +85,14 @@ export default Ember.Controller.extend({
         },
 
         refreshOptions: function() {
-            var courses = this.get('selectedCourses');
+            var courses = this.get('courses');
             console.log('refreshOptions', courses);
 
             var problem = this.get('problem');
 
             var columns = this.get('enabledColumns');
 
-            if (columns.get('length') > 14)
-            {
+            if (columns.get('length') > 14) {
                 return;
             }
 
@@ -74,9 +109,18 @@ export default Ember.Controller.extend({
                     endTime - beginTime) : -1;
 
                 return {
-                    "key": course.id,
-                    "name": course.title,
+                    "key": course.crn,
+                    "name": course.subject_id + " " + course.course_id + "." + course.section + " - "+ course.title,
                     "values": {
+                        "crn": course.crn,
+                        // "subject_id": course.subject_id,
+                        // "section": course.section,
+
+                        "begin_time_hours": course.begin_time && course.begin_time.hours,
+                        "begin_time_minutes": course.begin_time && course.begin_time.minutes,
+                        "end_time_hours": course.end_time && course.end_time.hours,
+                        "end_time_minutes": course.end_time && course.end_time.minutes,
+
                         "course_id": course.course_id,
                         "on_monday": course.on_monday ? 1 : 0,
                         "on_tuesday": course.on_tuesday ? 1 : 0,
@@ -93,9 +137,12 @@ export default Ember.Controller.extend({
                         "duration": duration,
 
                         // FIXME
-                        "prof_overall_quality": Math.random() * 5,
-                        "prof_average_grade": Math.random() * 5,
-                        "prof_helpfulness": Math.random() * 5,
+                        "prof_overall_quality": Math.random() *
+                            5,
+                        "prof_average_grade": Math.random() *
+                            5,
+                        "prof_helpfulness": Math.random() *
+                            5,
                         "prof_clarity": Math.random() * 5,
                         "prof_easiness": Math.random() * 5,
 
@@ -113,8 +160,8 @@ export default Ember.Controller.extend({
                         "has_essays": 0,
                         "requires_presentations": 0
 
-                    }
-                    //, "meta": course
+                    },
+                    "meta": course
                 };
             });
 
@@ -133,8 +180,18 @@ export default Ember.Controller.extend({
 
     enabledColumns: Ember.computed.filterBy('columns', 'enabled', true),
     tooManyColumns: Ember.computed.gt('enabledColumns.length', 14),
+    columns: function() {
+        var columnGroups = this.get('columnGroups');
+        var columns = columnGroups.mapBy('columns');
+        var merged = [];
+        columns = merged.concat.apply(merged, columns);
+        return columns;
+    }.property('columnGroups'),
 
-    columns: Ember.A([{
+    columnGroups: Ember.A([{
+        "name": "Time",
+        "description": "Scheduling your classes are work, family, or friends? This will help.",
+        "columns": Ember.A([{
             "key": "on_monday",
             "full_name": "On Mondays",
             "type": "NUMERIC",
@@ -176,38 +233,99 @@ export default Ember.Controller.extend({
             "type": "NUMERIC",
             "is_objective": false,
             "enabled": false
-        },
-
-        {
-            "key": "prof_awards",
-            "full_name": "# of Awards Professor has",
-            "type": "NUMERIC",
-            "is_objective": false
-        },
-        {
-            "key": "tutors",
-            "full_name": "# of Tutors",
-            "type": "NUMERIC",
-            "is_objective": false
-        },
-        {
-            "key": "has_facebook_group",
-            "full_name": "Has Facebook Group",
-            "type": "NUMERIC",
-            "is_objective": false
-        },
-        {
-            "key": "note_takers",
-            "full_name": "# of Note Takers",
-            "type": "NUMERIC",
-            "is_objective": false
-        },
-        {
+        }, {
             "key": "online",
             "full_name": "Is Online",
             "type": "NUMERIC",
             "is_objective": false
         }, {
+            "key": "begin_time",
+            "full_name": "Begining Time",
+            "type": "NUMERIC",
+            "is_objective": true,
+            "goal": "MAX",
+            "enabled": true
+        }, {
+            "key": "end_time",
+            "full_name": "Ending Time",
+            "type": "NUMERIC",
+            "is_objective": true,
+            "goal": "MIN",
+            "enabled": true
+        }, {
+            "key": "duration",
+            "full_name": "Duration",
+            "type": "NUMERIC",
+            "is_objective": true,
+            "goal": "MIN",
+            "enabled": true
+        }]).map(function(item) {
+            return Ember.Object.create(item);
+        })
+    }, {
+        "name": "Professor",
+        "description": "Match yourself up with a professor that meets your needs.",
+        "columns": Ember.A([{
+            "key": "prof_awards",
+            "full_name": "# of Awards Professor has",
+            "type": "NUMERIC",
+            "is_objective": false
+        }, {
+            "key": "prof_overall_quality",
+            "full_name": "Professor Overall Quality",
+            "type": "NUMERIC",
+            "enabled": true
+        }, {
+            "key": "prof_average_grade",
+            "full_name": "Professor Average Grade",
+            "type": "NUMERIC",
+        }, {
+            "key": "prof_helpfulness",
+            "full_name": "Professor Helpfulness",
+            "type": "NUMERIC",
+        }, {
+            "key": "prof_clarity",
+            "full_name": "Professor Clarity",
+            "type": "NUMERIC",
+        }, {
+            "key": "prof_easiness",
+            "full_name": "Professor Easiness",
+            "type": "NUMERIC",
+        }]).map(function(item) {
+            return Ember.Object.create(item);
+        })
+    }, {
+        "name": "Social",
+        "description": "Class just would not be as much fun without friends to share the experience with!",
+        "columns": Ember.A([{
+            "key": "tutors",
+            "full_name": "# of Tutors",
+            "type": "NUMERIC",
+            "is_objective": false
+        }, {
+            "key": "has_facebook_group",
+            "full_name": "Has Facebook Group",
+            "type": "NUMERIC",
+            "is_objective": false
+        }, {
+            "key": "note_takers",
+            "full_name": "# of Note Takers",
+            "type": "NUMERIC",
+            "is_objective": false
+        }, {
+            "key": "friends",
+            "full_name": "# of Friends in class",
+            "type": "NUMERIC",
+            "is_objective": true,
+            "goal": "MAX",
+            "enabled": true
+        }]).map(function(item) {
+            return Ember.Object.create(item);
+        })
+    }, {
+        "name": "Misc",
+        "description": "Miscellaneous columns of data",
+        "columns": Ember.A([{
             "key": "uses_powerpoints",
             "full_name": "Uses Powerpoints",
             "type": "NUMERIC",
@@ -232,23 +350,6 @@ export default Ember.Controller.extend({
             "full_name": "Requieres Presentations",
             "type": "NUMERIC",
             "is_objective": false
-        },
-
-
-        {
-            "key": "begin_time",
-            "full_name": "Begining Time",
-            "type": "NUMERIC",
-            "is_objective": true,
-            "goal": "MAX",
-            "enabled": true
-        }, {
-            "key": "end_time",
-            "full_name": "Ending Time",
-            "type": "NUMERIC",
-            "is_objective": true,
-            "goal": "MIN",
-            "enabled": true
         }, {
             "key": "course_id",
             "full_name": "Course Id",
@@ -257,59 +358,15 @@ export default Ember.Controller.extend({
             "goal": "MAX",
             "enabled": true
         }, {
-            "key": "duration",
-            "full_name": "Duration",
-            "type": "NUMERIC",
-            "is_objective": true,
-            "goal": "MIN",
-            "enabled": true
-        },
-
-        {
-            "key": "prof_overall_quality",
-            "full_name": "Professor Overall Quality",
-            "type": "NUMERIC",
-            "enabled": true
-        },
-
-        {
-            "key": "prof_average_grade",
-            "full_name": "Professor Average Grade",
-            "type": "NUMERIC",
-        },
-        {
-            "key": "prof_helpfulness",
-            "full_name": "Professor Helpfulness",
-            "type": "NUMERIC",
-        },
-        {
-            "key": "prof_clarity",
-            "full_name": "Professor Clarity",
-            "type": "NUMERIC",
-        },
-        {
-            "key": "prof_easiness",
-            "full_name": "Professor Easiness",
-            "type": "NUMERIC",
-        },
-
-        {
             "key": "class_rating",
             "full_name": "Class Rating",
             "type": "NUMERIC",
             "is_objective": true,
             "goal": "MAX",
             "enabled": true
-        }, {
-            "key": "friends",
-            "full_name": "# of Friends in class",
-            "type": "NUMERIC",
-            "is_objective": true,
-            "goal": "MAX",
-            "enabled": true
-        }
-    ]).map(function(item) {
-        return Ember.Object.create(item);
-    })
+        }]).map(function(item) {
+            return Ember.Object.create(item);
+        })
+    }])
 
 });

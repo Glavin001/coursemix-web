@@ -24,10 +24,6 @@ export default Ember.Component.extend({
     onResultsReady: function() {
         console.log('onResultsReady', arguments);
     },
-    onResultSelection: function() {
-        console.log('onResultSelection',
-            arguments);
-    },
 
     _refresh: function() {
         var self = this;
@@ -37,6 +33,11 @@ export default Ember.Component.extend({
             '/api/courses/dilemmas';
 
         var taClient = self.get('taClient');
+
+        self.$()
+            .addClass('loading')
+            .removeClass('error')
+            .removeClass('ready');
 
         var cb = function() {
 
@@ -62,8 +63,7 @@ export default Ember.Component.extend({
                     self.$('.error-message')
                         .text(errMsg);
 
-                    self.get('errCallback').apply(
-                        self, arguments);
+                    self.get('errCallback')();
                 }
             }, self.$('.tradeoff-analytics-container').get(
                 0));
@@ -72,11 +72,6 @@ export default Ember.Component.extend({
                 console.log('started', arguments);
 
                 var problem = self.get('problem');
-
-                self.$()
-                    .addClass('loading')
-                    .removeClass('error')
-                    .removeClass('ready');
 
                 taClient.show(problem, function() {
                         console.log(
@@ -87,10 +82,12 @@ export default Ember.Component.extend({
                             .removeClass('error')
                             .addClass('ready');
 
-                        self.get('onResultsReady').apply(
-                            self, arguments);
+                        self.get('onResultsReady')();
                     },
-                    self.get('onResultSelection'));
+                    function(selection) {
+                        console.log('onResultSelection', selection);
+                        self.sendAction('onResultSelection', selection);
+                    });
 
             });
 

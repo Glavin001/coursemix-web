@@ -23,6 +23,12 @@ app.import('bower_components/bootstrap/dist/css/bootstrap.css.map');
 app.import('bower_components/bootstrap/dist/fonts/glyphicons-halflings-regular.woff', {
   destDir: 'fonts'
 });
+app.import('bower_components/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2', {
+  destDir: 'fonts'
+});
+
+app.import('bower_components/select2/select2-bootstrap.css');
+
 app.import('bower_components/momentjs/moment.js');
 
 module.exports = app.toTree();
