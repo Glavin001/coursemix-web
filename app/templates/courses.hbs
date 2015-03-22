@@ -1,0 +1,93 @@
+<h2>Courses</h2>
+
+<h3>Step 1. Select subset of Courses</h3>
+
+<button {{action 'findCourses'}} class="btn btn-primary">Find courses</button>
+
+<br/><br/>
+
+{{#if controller.courses}}
+
+  {{#each course in controller.courses}}
+
+    <div class="panel panel-primary animated fadeInUp">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          <button class="btn btn-success add-course-btn" data-course="">Add Course</button>
+          {{course.crn}} - {{course.subject_id}} {{course.course_id}}.{{course.section}} - {{course.title}}
+        </h3>
+      </div>
+      <div class="panel-body">
+        <div>
+          From
+          <strong>{{format-date course.start_date "MMMM Do, YYYY"}}</strong>
+          to
+          <strong>{{format-date course.end_date "MMMM Do, YYYY"}}</strong>
+          at
+          <strong>
+            {{#if course.begin_time}}
+              {{course.begin_time.hours}}:{{number-with-digits course.begin_time.minutes 2}}
+            {{else}}
+              N/A
+            {{/if}}
+            to
+            {{#if course.end_time}}
+              {{course.end_time.hours}}:{{number-with-digits course.end_time.minutes 2}}
+            {{else}}
+              N/A
+            {{/if}}
+          </strong>
+        </div>
+        <div>
+
+          {{#if course.on_monday}}
+            <span class="label label-info">Monday</span>
+          {{/if}}
+          {{#if course.on_tuesday}}
+            <span class="label label-info">Tuesday</span>
+          {{/if}}
+          {{#if course.on_wednesday}}
+            <span class="label label-info">Wednesday</span>
+          {{/if}}
+          {{#if course.on_thursday}}
+            <span class="label label-info">Thursday</span>
+          {{/if}}
+          {{#if course.on_friday}}
+            <span class="label label-info">Friday</span>
+          {{/if}}
+          {{#if course.on_saturday}}
+            <span class="label label-info">Saturday</span>
+          {{/if}}
+          {{#if course.on_sunday}}
+            <span class="label label-info">Sunday</span>
+          {{/if}}
+
+          <code>
+              {{json-stringify course}}
+          </code>
+
+        </div>
+      </div>
+    </div>
+
+  {{/each}}
+
+{{else}}
+    {{#if controller.courses.isPending}}
+        <div class="alert alert-info">
+          Loading...
+        </div>
+    {{else}}
+      <div class="alert alert-danger">
+        No classes found. Please search above.
+      </div>
+    {{/if}}
+{{/if}}
+
+<h3>Step 2. Configure Your Preferences</h3>
+
+<h3>Step 3. Submit Tradeoff Analytics</h3>
+
+<h3>Step 4. Decide on courses</h3>
+
+<h3>Step 5. Register</h3>
