@@ -126,7 +126,7 @@ export default Ember.Controller.extend({
                 console.log(arguments);
             });
 
-            self.send('speak', 'I have emailed your courses. Enjoy!', function(){
+            this.send('speak', 'I have emailed your courses. Enjoy!', function(){
 
             });
 
