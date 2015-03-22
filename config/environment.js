@@ -38,6 +38,11 @@ module.exports = function(environment) {
         // ENV.APP.LOG_TRANSITIONS_INTERNAL = true;
         // ENV.APP.LOG_VIEW_LOOKUPS = true;
         ENV.APP.apiHost = "http://localhost:3000"
+
+        if (process.env.COURSEMIX_API) {
+            ENV.APP.apiHost = process.env.COURSEMIX_API;
+        }
+        
     }
 
     if (environment === 'test') {
